@@ -8,6 +8,7 @@ import Api from "../../helper/api";
 export default function HomeView() {
   const api = new Api();
   const [loading, setLoading] = useState(true);
+  const [deviceCount, setDeviceCount] = useState("-");
   const [allDevices, setAllDevices] = useState([]);
 
   const [columns, setColumns] = useState([
@@ -25,7 +26,7 @@ export default function HomeView() {
       title: "Action",
       key: "action",
       render: (text, record) => (
-        <Link href={`/${record.key}`}>
+        <Link href={`/device/${record.key}`}>
           <a>View Device</a>
         </Link>
       ),
@@ -39,7 +40,10 @@ export default function HomeView() {
         .getAllDevices()
         .then((response) => {
           const { data } = response;
-          const devicesList = data.map((device, index) => {
+          const sortedDevicesList = data.sort((a, b) => {
+            return a.name.localeCompare(b.name);
+          });
+          const devicesList = sortedDevicesList.map((device, index) => {
             return {
               key: device.id,
               sn: index + 1,
@@ -50,12 +54,26 @@ export default function HomeView() {
                 }),
             };
           });
+
           setAllDevices(devicesList);
         })
         .catch((err) => {
           notification.error({
             message: "Oops!",
             description: "Something went wrong!, Unable to load devices",
+          });
+        });
+
+      api
+        .getDeviceCount()
+        .then((response) => {
+          const { data } = response;
+          setDeviceCount(data.count);
+        })
+        .catch((err) => {
+          notification.error({
+            message: "Oops!",
+            description: "Something went wrong!, Unable to get device count",
           });
         });
     } finally {
@@ -67,7 +85,7 @@ export default function HomeView() {
     <StylesWrapper>
       <div>
         <p>Welcome to Canary Devices</p>
-        <h1>All Devices </h1>
+        <h1>All Devices - {deviceCount}</h1>
         <Card className="cardstyle" style={{ width: "100%" }}>
           <Table loading={loading} dataSource={allDevices} columns={columns} />
         </Card>

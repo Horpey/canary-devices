@@ -25,6 +25,15 @@ export default class Api {
   getAllDevices = () => {
     return this.init().get("/devices");
   };
+  getDeviceCount = () => {
+    return this.init().get("/devices/count");
+  };
+  getDeviceByID = (id) => {
+    return this.init().get(`/devices/${id}`);
+  };
+  getDeviceReadings = (id) => {
+    return this.init().get(`/devices/${id}/readings`);
+  };
 
   //   addNewUser = (data) => {
   //     return this.init().post("/users", data);
