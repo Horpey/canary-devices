@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAsync } from "react-use";
+import moment from "moment";
 import Link from "next/link";
 import { Card, notification, Spin } from "antd";
 import { StylesWrapper } from "./styles";
@@ -21,6 +22,11 @@ const DeviceView = ({ id }) => {
   const [loading, setLoading] = useState(true);
   const [deviceData, setDeviceData] = useState([]);
   const [renderChart, setRenderChart] = useState(false);
+  const [charts, setCharts] = useState([
+    "temperature",
+    "humidity",
+    "air_quality",
+  ]);
 
   const [options, setOptions] = useState({
     responsive: true,
@@ -45,6 +51,7 @@ const DeviceView = ({ id }) => {
     const filteredReadings = readings.filter(
       (reading) => reading.type === type
     );
+
     return filteredReadings;
   };
 
@@ -70,33 +77,55 @@ const DeviceView = ({ id }) => {
           const { data } = response;
 
           let labels = [];
-          labels = data.map((reading) => reading.created);
+          labels = filterReadings(data, "temperature").map(
+            (reading) => reading.id
+            // moment(reading.created).format("ddd, MMM Do YYYY, h:mm:ss a")
+          );
+
           setData({
             labels,
             datasets: [
               {
                 label: "Temperature",
-                data: filterReadings(data, "temperature").map(
-                  (reading) => reading.value
-                ),
+                data:
+                  data &&
+                  filterReadings(data, "temperature").map((reading) =>
+                    Number(reading.value)
+                  ),
                 borderColor: "rgb(255, 99, 132)",
-                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                backgroundColor: "rgba(255, 99, 132, 0.6)",
+                cubicInterpolationMode: "monotone",
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 4,
               },
               {
                 label: "Humidity",
-                data: filterReadings(data, "humidity").map(
-                  (reading) => reading.value
-                ),
-                borderColor: "rgb(53, 162, 235)",
-                backgroundColor: "rgba(53, 162, 235, 0.5)",
+                data:
+                  data &&
+                  filterReadings(data, "humidity").map((reading) =>
+                    Number(reading.value)
+                  ),
+                borderColor: "rgb(50, 108, 177)",
+                backgroundColor: "rgba(50, 108, 177, 0.6)",
+                cubicInterpolationMode: "monotone",
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 4,
               },
               {
                 label: "Air Quality",
-                data: filterReadings(data, "air_quality").map(
-                  (reading) => reading.value
-                ),
-                borderColor: "rgb(240 134 19)",
-                backgroundColor: "rgba(240, 134, 19, 0.5)",
+                data:
+                  data &&
+                  filterReadings(data, "air_quality").map((reading) =>
+                    Number(reading.value)
+                  ),
+                borderColor: "rgb(146, 222, 24)",
+                backgroundColor: "rgb(146, 222, 24, 0.6)",
+                cubicInterpolationMode: "monotone",
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 4,
               },
             ],
           });
