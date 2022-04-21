@@ -15,6 +15,12 @@ const DashboardLayout = ({ children }) => {
       slug: "devices",
       active: true,
     },
+    {
+      title: "Create Device",
+      link: "/create-device",
+      slug: "create_device",
+      active: false,
+    },
   ];
 
   return (
